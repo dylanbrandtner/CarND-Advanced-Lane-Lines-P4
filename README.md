@@ -22,7 +22,7 @@ The goals / steps of this project are the following:
 [image6]: ./output_images/test5_perspective_warp.jpg "Warp"
 [image7]: ./output_images/test5_found_lanes.jpg "Histogram"
 [image8]: ./output_images/test5_found_lanes_centoids.jpg "Convolution"
-[image8]: ./output_images/test5_final_result.jpg "Result"
+[image9]: ./output_images/test5_final_result.jpg "Result"
 
 
 ## Source code
