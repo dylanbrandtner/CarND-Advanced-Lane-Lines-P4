@@ -11816,7 +11816,7 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.image.AxesImage at 0x1e113977c50&gt;</pre>
+<pre>&lt;matplotlib.image.AxesImage at 0x2d41b0f6c18&gt;</pre>
 </div>
 
 </div>
@@ -12163,6 +12163,9 @@ div#notebook {
                           <span class="p">[</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">right_cutoff</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
                           <span class="p">[</span><span class="n">lines</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">right_cutoff</span><span class="p">,</span><span class="n">imshape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]])</span>
         
+        <span class="nb">print</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
+        
         <span class="c1"># Calculate perspective transform matrices</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">M</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getPerspectiveTransform</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Minv</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">getPerspectiveTransform</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
@@ -12199,6 +12202,31 @@ div#notebook {
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[[  287.   670.]
+ [  543.   485.]
+ [  743.   485.]
+ [ 1032.   670.]]
+[[  187.   720.]
+ [  187.     0.]
+ [ 1082.     0.]
+ [ 1082.   720.]]
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -12239,7 +12267,7 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.text.Text at 0x1e1142d3710&gt;</pre>
+<pre>&lt;matplotlib.text.Text at 0x2d41ba44400&gt;</pre>
 </div>
 
 </div>
@@ -12289,7 +12317,7 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.image.AxesImage at 0x1e1149394e0&gt;</pre>
+<pre>&lt;matplotlib.image.AxesImage at 0x2d41bdcb470&gt;</pre>
 </div>
 
 </div>
@@ -12622,7 +12650,7 @@ div#notebook {
 
 
 <div class="output_text output_subarea output_execute_result">
-<pre>&lt;matplotlib.text.Text at 0x1e114ac2780&gt;</pre>
+<pre>&lt;matplotlib.text.Text at 0x2d41bf55748&gt;</pre>
 </div>
 
 </div>
@@ -12706,20 +12734,7 @@ div#notebook {
         <span class="n">win_xleft_high</span> <span class="o">=</span> <span class="n">leftx_current</span> <span class="o">+</span> <span class="n">margin</span>
         <span class="n">win_xright_low</span> <span class="o">=</span> <span class="n">rightx_current</span> <span class="o">-</span> <span class="n">margin</span>
         <span class="n">win_xright_high</span> <span class="o">=</span> <span class="n">rightx_current</span> <span class="o">+</span> <span class="n">margin</span>        
-        
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        if (window &gt; nwindows/2):</span>
-<span class="sd">            # See if a curve has been established</span>
-<span class="sd">            if ((leftx_current &gt; leftx_base) &amp; (rightx_current &gt; rightx_base)):</span>
-<span class="sd">                #Right curve</span>
-<span class="sd">                win_xleft_low = leftx_current</span>
-<span class="sd">                win_xright_low = rightx_current                </span>
-<span class="sd">            elif ((leftx_current &lt; leftx_base) &amp; (rightx_current &lt; rightx_base)):</span>
-<span class="sd">                # Left curve</span>
-<span class="sd">                win_xleft_high = leftx_current</span>
-<span class="sd">                win_xright_high = rightx_current</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        
+               
         <span class="c1"># If we are running off the end of the image, exit</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">win_xleft_low</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">win_xright_high</span> <span class="o">&gt;</span> <span class="n">binary_warped</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
             <span class="k">break</span>
