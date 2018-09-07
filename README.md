@@ -39,7 +39,7 @@ All source code referenced below is contained in the [IPython notebook](./LaneLi
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 
-### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
+Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
 ---
 ### Camera Calibration and Transformation
