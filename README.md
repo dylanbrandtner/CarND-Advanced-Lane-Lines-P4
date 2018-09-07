@@ -37,7 +37,7 @@ The specific goals / steps of this project are the following:
 
 All source code referenced below is contained in the [IPython notebook](./LaneLines.ipynb) in this repo.  See that notebook to follow along with the code changes described here. 
 
-## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
+## [Rubric Points](https://review.udacity.com/#!/rubrics/571/view)
 
 Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
