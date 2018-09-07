@@ -35,7 +35,7 @@ The specific goals / steps of this project are the following:
 
 ## Source code
 
-All source code referenced below is contained in the IPython notebook located in "./LaneLines.ipynb".  See that notebook to follow along with the code changes described here. 
+All source code referenced below is contained in the [IPython notebook](./LaneLines.ipynb) in this repo.  See that notebook to follow along with the code changes described here. 
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 
