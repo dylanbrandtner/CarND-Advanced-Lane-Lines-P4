@@ -91,7 +91,7 @@ I used the following test image to tune my pipeline ("test5.jpg"):
 
 #### 1. Distortion correction
 
-I applied the distortion correction calculated in the calibration phase to the test images and got the following result:
+I applied the distortion correction calculated in the calibration phase to the test image and got the following result:
 ![alt text][image4]
 
 #### 2. Thresholding
@@ -99,7 +99,7 @@ I applied the distortion correction calculated in the calibration phase to the t
 I used a combination of thresholds to generate a binary image. I went through two stages of tuning for these thresholds, but my first attempt based on this test image used the following:
 * Sobel gradients on a greyscaled image:
 	* A Sobel gradient in the x direction with thresholds of 20 to 100
-	* A directional threshold with a sobel kernel size of 15, and thresholds of 0.5 and 1.3
+	* A directional threshold with a Sobel kernel size of 15, and thresholds of 0.5 and 1.3
 * Channel selections on an HLS converted image:
 	* A Hue channel max of 30
 	* A Saturation channel minimum of 100
@@ -159,15 +159,15 @@ The result was quite good for the most part, but at around 40 seconds, the car d
 
 Here's a [link to my first challenge video result](./challenge_video_out.mp4).
 
-In this video, the lane finding immediately picks up the wrong lines.  It sees some blacktop residue and shadows as the histogram peaks, and then completely drops the lanes under the bridge. 
+In this video, the lane finding immediately picks up the wrong lines.  It sees some blacktop residue and shadows as the histogram peaks, and then completely drops the lanes after the overpass. 
 
 ---
 
 ### Improving the Pipeline
 
-When viewing the above results, two major things became clear:  
-1. The current thresholding operations resulted in too noisy of an image for the lane finding operation, and prominent road imperfections or vertical shadows were often mistaken for lanes.
-2. Mistakes in the lane finding pipeline caused major disruptions in the pipeline, and it struggled to ever recover from these 
+When viewing the above results, two major problems became clear:  
+1. The current thresholding operations resulted in too noisy of an image for the lane finding algorithm, and prominent road imperfections or vertical shadows were often mistaken for lanes.
+2. Mistakes in the lane finding pipeline caused major disruptions in the pipeline, and it struggled to ever recover from a bad detection.
 
 #### 1. Improving the thresholds
 
@@ -183,14 +183,14 @@ The resulting overhead lane finding was this:
 
 ![alt text][image12]
 
-As you can see, the Sobel threshold picked up the shadow on the left and road imperfection in the middle. However, it also picked up the right lane line where the Saturation channel select failed. After thinking about what these had in common and examining additional images in more detail, I had a few other ideas:
+As you can see, the Sobel threshold picked up the shadow on the left and road imperfection in the middle. However, it also picked up the right lane line where the Saturation channel select failed. After thinking about what these had in common and examining additional images in more detail, I had a couple of new ideas:
 1. The colors of lanes are always yellow or white
 2. The Hue channel select consistently filtered out the shadows and road imperfections
 
 Therefore, I updated my thresholds to the following (updates are in **bold**):
-* Sobel gradients on greyscale image:
+* Sobel gradients on a greyscaled image:
 	* A Sobel gradient in the x direction with thresholds of 20 to 100
-	* A directional threshold with a sobel kernel size of 15, and thresholds of .5 and 1.3
+	* A directional threshold with a Sobel kernel size of 15, and thresholds of .5 and 1.3
 	* **Combine the above with a Hue channel max of 30**
 * Channel selections on an HLS converted image:
 	* A Hue channel max of 30
@@ -213,7 +213,7 @@ As suggested in the course materials, in code block 31 of the notebook I setup a
 
 #### 3. Identifying outliers
 
-As part of the LaneLine class, I also calculated the radius, position of the lane from the center of the image, and the difference of the current lane detections polynomial coefficients from the current "best fit" average.  Using this information, I could set thresholds for lane detections that were outside reasonable limits.  
+As part of the LaneLine class, I also calculated the radius, position of the lane from the center of the image, and the difference of the current lane detection's polynomial coefficients from the current "best fit" average.  Using this information, I could set thresholds for lane detections and reject ones that were outside reasonable limits.  
 
 For radius, anything with a radius below 100m, or above 100,000m would be rejected.  Any lanes detected more than 3 meters away from center would be rejected.  I then calculated the [Median absolute deviation](https://en.wikipedia.org/wiki/Median_absolute_deviation) of the current polynomial, and used this algorithm to give new polynomial's a "Z score". Typically in this methodology, Z scores above 1.0 are considered outliers, so I set that as my threshold.
 
@@ -223,7 +223,7 @@ After setting the above thresholds, I needed a way to reset the lane detection i
 
 ### Improved results
 
-In code block 32, I combined the above improvements into a new video pipeline, and applied it to the videos.  I also added some updates to the text on screen so the viewer could see when frames were being dropped for the left and right lanes, and could see when the pipeline had been reset.
+In code block 32, I combined the above improvements into a new video pipeline, and applied it to the videos.  I also added some updates to the text on screen so I could see when frames were being dropped for the left and right lanes, and could see when the pipeline had been reset.
 
 #### Project Video Improved Result
 
