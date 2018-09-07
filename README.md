@@ -50,7 +50,7 @@ All of the calibration code is contained in the third code cell of the notebook.
 
 For distortion correction, I followed the instructions from the course materials to use the OpenCV findChessboardCorners() method on each chessboard image provided after converting them to greyscale.  The corners are appended to an image points array, and then the OpenCV calibrateCamera() method is used to calculate distortion coefficients and the camera matrix.   
 
-I setup a method to apply this distortion correction to an input image image using the OpenCV undistort() function.  I tried this out on straight_lines2.jpg and saw this result:
+I setup a method to apply this distortion correction to an input image using the OpenCV undistort() function.  I tried this out on straight_lines2.jpg and saw this result:
 
 ![alt text][image1]
 
@@ -78,15 +78,15 @@ This resulted in the following source and destination points:
 | 743, 485    | 1082,   0    |
 | 1032,670    | 1082, 720    |
 
-I stored this information in a transform matrix and inverse transform matrix using OpenCV's getPerspectiveTransform() so we can move between perspectives.  Applying this to the undistorted image above resulted in this:
+I stored this information in a transform matrix and inverse transform matrix using OpenCV's getPerspectiveTransform() so I could move between perspectives.  Applying this to the undistorted image above resulted in the following image:
 
 ![alt text][image2]
 
 ### Pipeline (single images)
 
-At this point I had the calibration data to start my image pipeline.   In  code block 7 of my notebook, I setup a 'CameraImage' class to store each image and apply various parts of the image pipeline to it. 
+At this point I had the calibration data needed to start my image pipeline.   In  code block 7 of my notebook, I setup a 'CameraImage' class to store each image and apply various parts of the image pipeline to it. 
 
-I used the following test image to tune my pipeline:
+I used the following test image to tune my pipeline ("test5.jpg"):
 ![alt text][image3]
 
 #### 1. Distortion correction
@@ -97,9 +97,9 @@ I applied the distortion correction calculated in the calibration phase to the t
 #### 2. Thresholding
 
 I used a combination of thresholds to generate a binary image. I went through two stages of tuning for these thresholds, but my first attempt based on this test image used the following:
-* Sobel gradients on greyscale image:
+* Sobel gradients on a greyscaled image:
 	* A Sobel gradient in the x direction with thresholds of 20 to 100
-	* A directional threshold with a sobel kernel size of 15, and thresholds of .5 and 1.3
+	* A directional threshold with a sobel kernel size of 15, and thresholds of 0.5 and 1.3
 * Channel selections on an HLS converted image:
 	* A Hue channel max of 30
 	* A Saturation channel minimum of 100
@@ -118,7 +118,7 @@ I then applied the perspective transform from my calibration data on the thresho
 
 #### 4. Lane finding
 
-In code blocks 9-11 I copy/modified the source code from the course materials to find lane pixels in an image using sliding windows and fit a polynomial to this.  I tried both the histogram and convolution approaches to see what was best.
+In code blocks 9-11, I utilized the code from the course materials to find lane pixels in an image using sliding windows and then used numpy's polyfit() method to fit a polynomial to the found pixels.  I tried both the histogram and convolution approaches to see what was best.
 
 Histogram and sliding windows result:
 ![alt text][image7]
@@ -126,13 +126,13 @@ Histogram and sliding windows result:
 Convolution and centroids result:
 ![alt text][image8]
 
-The sliding window result was more reliable when tested on various images, and ended up being the method I used long term.  Also, the convolution method was more complex for me to understand and difficult for me to tinker with. 
+The sliding window result was more reliable when tested on various images, and ended up being the method I used long term.  Also, the convolution method was more complex for me to understand and difficult for me to tinker with (ex. I added some logic to stop the detection if the sliding windows reached the edges of the image).
 
-I also pulled in the search_around_poly() method for later use in the video pipeline to search for new pixels only within a certain margin of the input polynomial.
+I also pulled in the search_around_poly() method for later use in the video pipeline to search for new pixels only within a certain margin of the input polynomials.
 
 #### 5. Overlaying a found lane image
 
-In code block 12, I updated the combine_images() method from the course materials to take the found lane information and replot it on the image.  I also took the found lane image from above and overlaid it in the top right corner for reference. 
+In code block 12, I updated the combine_images() method from the course materials to take the found lane information and replot it on the image.  I also took the found lane image from above and overlaid it in the top right corner so I could always see what the lane detection algorithm was doing. 
 
 Here is my result on the test image:
 ![alt text][image9]
@@ -141,9 +141,7 @@ Here is my result on the test image:
 
 In code block 16, I used the instructions from the lesson to calculate the radius of the found polynomials. I then calculated the offset from lane center by subtracting the left and right x values at the bottom of each lane to get the lane size, then finding the lane center by adding half the lane size to the bottom pixel of the left lane.  The distance from lane center was then the image center minus the lane center.  This gave me values in pixels. 
 
-I would convert to meters later in my video processing pipeline (block 17). For distance from lane center, I simply multiplied by x meters per pixel.  For calculating radius, I had perform a more complex calculating that was taken from the course materials.  See code block 17 for full details. 
-
-I used y meters per pixel of 30/720 and x meters per pixel of 3.7/700.  These were given the the course materials.  I could have calculated them myself using the input calibration images and known data about US lane size and lane line lengths, however, this did not seem worthwhile since the course material as part of this exercise as the examples values were based on the camera used in this exercise.  This would not work if the camera type or mount point changed. 
+I would convert to meters later in my video processing pipeline (block 17). For distance from lane center, I simply multiplied by x meters per pixel.  For calculating radius, I had perform a more complex calculation that was taken from the course materials.  See code block 17 for full details. For the conversion, I used a y meters per pixel value of 30/720 and a x meters per pixel value of 3.7/700.  These were given in the the course materials.  I could have calculated them myself using the input calibration images and known data about US lane size and lane line lengths, however, this did not seem worthwhile since the example values were based on the camera used in this exercise, and they seemed relatively consistent with my eyeball measurements.  This would not work if the camera mount point or camera itself was changed. 
 
 ---
 
@@ -153,13 +151,13 @@ In code block 17, I setup a video processing pipeline to be used with moviepy's 
 
 #### Project Video First Result
 
-Here's a [link to my project video result](./project_video_out.mp4).
+Here's a [link to my first project video result](./project_video_out.mp4).
 
 The result was quite good for the most part, but at around 40 seconds, the car drives over a different colored patch of road, and the lane finding veers off course and cannot recover.   
 
 #### Challenge Video First Result
 
-Here's a [link to my challenge video result](./challenge_video_out.mp4).
+Here's a [link to my first challenge video result](./challenge_video_out.mp4).
 
 In this video, the lane finding immediately picks up the wrong lines.  It sees some blacktop residue and shadows as the histogram peaks, and then completely drops the lanes under the bridge. 
 
@@ -168,8 +166,8 @@ In this video, the lane finding immediately picks up the wrong lines.  It sees s
 ### Improving the Pipeline
 
 When viewing the above results, two major things became clear:  
-1. The current thresholding operations resulted in too noisy of an image for the lane finding operation, and prominent road imperfections were often mistaken for lanes.
-2. Mistakes in the lane finding pipeline caused major disruptions in the resulting image and the video pipeline struggled to recover from these 
+1. The current thresholding operations resulted in too noisy of an image for the lane finding operation, and prominent road imperfections or vertical shadows were often mistaken for lanes.
+2. Mistakes in the lane finding pipeline caused major disruptions in the pipeline, and it struggled to ever recover from these 
 
 #### 1. Improving the thresholds
 
@@ -188,6 +186,7 @@ The resulting overhead lane finding was this:
 As you can see, the Sobel threshold picked up the shadow on the left and road imperfection in the middle. However, it also picked up the right lane line where the Saturation channel select failed. After thinking about what these had in common and examining additional images in more detail, I had a few other ideas:
 1. The colors of lanes are always yellow or white
 2. The Hue channel select consistently filtered out the shadows and road imperfections
+
 Therefore, I updated my thresholds to the following (updates are in **bold**):
 * Sobel gradients on greyscale image:
 	* A Sobel gradient in the x direction with thresholds of 20 to 100
@@ -206,15 +205,17 @@ I plotted these new thresholds, and saw these results:
 
 ![alt text][image14]
 
-Much better! The real lane lines are shown with hardly any other noise.  
+Much better! The real lane lines are shown with hardly any other noise, and the lane detection is working well.  The results on other frames I tested were also improved significantly.   
 
 #### 2. Keeping a history
 
-As suggested in the course materials, in code block 31 of the notebook I setup a "LaneLine" class to store each line, keep a history of previous lane detections, and average the result into a "best fit".  I setup a minimum of 5 detections before the lane would be considered "detected" and would be displayed.   
+As suggested in the course materials, in code block 31 of the notebook I setup a "LaneLine" class to store each detected lane, keep a history of previous lane detections, and average the result into a "best fit".  I setup a minimum of 5 detections before the lane would be considered "detected" and would be displayed.   
 
 #### 3. Identifying outliers
 
-As part of the LaneLine class, I also calculated the radius, position of the lane from the center of the image, and difference of the current lane detections polynomial from the current "best fit" average.  Using this information, I could setup thresholds for lane detections that were outside reasonable limits.  For radius, anything with a radius below 100m, or above 100,000m would be rejected.  Any lanes detected more than 3 meters away from center would be rejected.  I then calculated the [Median absolute deviation](https://en.wikipedia.org/wiki/Median_absolute_deviation) of the current polynomial, and used this algorithm to give new polynomial's a "Z score". Typically in this methodology, Z scores above 1.0 are considered outliers, so I set that as my threshold.
+As part of the LaneLine class, I also calculated the radius, position of the lane from the center of the image, and the difference of the current lane detections polynomial coefficients from the current "best fit" average.  Using this information, I could set thresholds for lane detections that were outside reasonable limits.  
+
+For radius, anything with a radius below 100m, or above 100,000m would be rejected.  Any lanes detected more than 3 meters away from center would be rejected.  I then calculated the [Median absolute deviation](https://en.wikipedia.org/wiki/Median_absolute_deviation) of the current polynomial, and used this algorithm to give new polynomial's a "Z score". Typically in this methodology, Z scores above 1.0 are considered outliers, so I set that as my threshold.
 
 #### 4.  Pipeline reset
 
@@ -242,8 +243,8 @@ At this point, I wanted to see how my improved pipeline would fare on the even h
 
 Here's a [link to my harder challenge video result](./harder_challenge_video_out.mp4).
 
-Things start off fine, but as the lighting conditions begin to deteriorate and the curves get sharper, the lanes are quickly lost, and near the end, the detections completely overlap.  I saw this as a reasonable stopping point for the purposes of this exercise, but had some other ideas for improvements if I had more time:
-* I tried a few more rounds of threshold tuning, but never found a combination that was able to detect lanes reliably in all lighting conditions. My most reliable detection thresholds in light conditions were often the complete inverse in the dark.  Hue was most consistent channel I found, but using it exclusively resulted in far too much noise. I started to wonder if using the same thresholds for both light and dark was simply not feasible, and perhaps a better approach would be to detect the overall light condition using an image average, and then apply different thresholds based on the overall lighting. 
+Things start off fine, but as the lighting conditions begin to deteriorate and the curves get sharper, the lanes are quickly lost, and near the end, the detections completely overlap.  I saw this as a reasonable stopping point for the purposes of this exercise, but I had several other ideas for improvements if I had more time:
+* I tried a few more rounds of threshold tuning, but never found a combination that was able to detect lanes reliably in all lighting conditions. My most reliable detection thresholds in light conditions were often the complete inverse in the dark.  Hue was most consistent channel I found, but using it exclusively resulted in far too much noise. I started to wonder if using the same thresholds for both light and dark was simply not feasible, and perhaps a better approach would be to detect the overall light condition using an image average, and then apply different thresholds for light vs. dark conditions. 
 * Object detection (which I believe is the next set of lessons), could be useful to filter out noise from other vehicles, signs, etc.   
 * The tight curves caused my overhead image to barely show the full lane in some cases.  My original region of interest cut off some of the left/right edges of the image to reduce noise, but I might need to bring these back to see the full curves.  
-* Real lane size should be fairly consistent, but my detections often weren't, despite my lane base position thresholds and detection margins.  My lane base positions were an absolute value of the distance from the center of the image.  Instead, I could have added a variable to the LaneLine class that specified whether the lane was the left or the right one, and then the thresholds could be positive for the right lane, and negative for the left.  Alternatively, I could required the total size of the detected lane (i.e. the difference of the two) to be within a threshold instead of using distance from center.  I could also feed this threshold back into the lane finding pipeline to force the sliding windows to remain a certain distance apart, or run multiple lane finding passes on the overhead image to try and get the best result.  
+* Real lane size should be fairly consistent, but my detections often weren't, despite my lane base position thresholds and detection margins.  My lane base positions were an absolute value of the distance from the center of the image.  Instead, I could have added a variable to the LaneLine class that specified whether the lane was the left or the right one, and then the thresholds could be positive for the right lane, and negative for the left.  Alternatively, I could require the total size of the detected lane (i.e. the difference of the two) to be within a threshold instead of using distance from center.  I could also feed this threshold back into the lane finding pipeline to force the sliding windows to remain a certain distance apart.  I could also run multiple lane finding passes on the overhead image with different starting points to try and get the best result, as sometimes the first histogram peak was not the real lane line.
