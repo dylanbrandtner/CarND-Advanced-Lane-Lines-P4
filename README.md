@@ -174,11 +174,17 @@ When viewing the above results, two major things became clear:
 #### 1. Improving the thresholds
 
 The road quality in the challenge video was much worse than the project video, so I used an early frame in that video to guide my threshold tuning.  I grabbed the frame from 4 seconds:
+
 ![alt text][image10]
+
 Applying my thresholds and plotting the various pieces, I saw this:
+
 ![alt text][image11]
+
 The resulting overhead lane finding was this:
+
 ![alt text][image12]
+
 As you can see, the Sobel threshold picked up the shadow on the left and road imperfection in the middle. However, it also picked up the right lane line where the Saturation channel select failed. After thinking about what these had in common and examining additional images in more detail, I had a few other ideas:
 1. The colors of lanes are always yellow or white
 2. The Hue channel select consistently filtered out the shadows and road imperfections
@@ -195,7 +201,9 @@ Therefore, I updated my thresholds to the following (updates are in **bold**):
 	* **Selected white by looking for high values in all three channels (above 200)**
 
 I plotted these new thresholds, and saw these results:
+
 ![alt text][image13]
+
 ![alt text][image14]
 
 Much better! The real lane lines are shown with hardly any other noise.  
